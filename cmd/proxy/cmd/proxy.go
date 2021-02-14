@@ -148,6 +148,7 @@ func (c *ClusterChecker) startPollonProxy() error {
 		c.endPollonProxyCh <- c.pp.Start()
 	}()
 
+	proxyHealthGauge.Set(1)
 	return nil
 }
 
@@ -160,6 +161,7 @@ func (c *ClusterChecker) stopPollonProxy() {
 		c.pp = nil
 		c.listener.Close()
 		c.listener = nil
+		proxyHealthGauge.Set(0)
 	}
 }
 
@@ -212,6 +214,11 @@ func (c *ClusterChecker) Check() error {
 		c.sendPollonConfData(pollon.ConfData{DestAddr: nil})
 		return fmt.Errorf("clusterdata validation failed: %v", err)
 	}
+
+	// Mark that the clusterdata we've received is valid. We'll use this metric to detect
+	// when our store is failing to serve a valid clusterdata, so it's important we only
+	// update the metric here.
+	clusterdataLastValidUpdateSeconds.SetToCurrentTime()
 
 	cdProxyCheckInterval := cd.Cluster.DefSpec().ProxyCheckInterval.Duration
 	cdProxyTimeout := cd.Cluster.DefSpec().ProxyTimeout.Duration
