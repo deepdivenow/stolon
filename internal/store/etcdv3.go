@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"github.com/prometheus/client_golang/prometheus"
 	"time"
 
 	etcdclientv3 "go.etcd.io/etcd/clientv3"
@@ -46,38 +47,58 @@ func (s *etcdV3Store) Put(pctx context.Context, key string, value []byte, option
 			lease, err := s.c.Grant(ctx, int64(options.TTL.Seconds()))
 			cancel()
 			if err != nil {
+				etcdv3Count.With(prometheus.Labels{"type": "put","status": "error"}).Inc()
 				return err
 			}
 			etcdv3Options = append(etcdv3Options, etcdclientv3.WithLease(lease.ID))
 		}
 	}
 	ctx, cancel := context.WithTimeout(pctx, s.requestTimeout)
+	start := time.Now()
 	_, err := s.c.Put(ctx, key, string(value), etcdv3Options...)
 	cancel()
+	duration := time.Since(start)
+	etcdv3Duration.With(prometheus.Labels{"type": "put"}).Add(duration.Seconds()*1000)
+	if err!= nil {
+		etcdv3Count.With(prometheus.Labels{"type": "put","status": "error"}).Inc()
+	} else {
+		etcdv3Count.With(prometheus.Labels{"type": "put","status": "ok"}).Inc()
+	}
 	return fromLibKVStoreErr(err)
 }
 
 func (s *etcdV3Store) Get(pctx context.Context, key string) (*KVPair, error) {
 	ctx, cancel := context.WithTimeout(pctx, s.requestTimeout)
+	start := time.Now()
 	resp, err := s.c.Get(ctx, key)
 	cancel()
+	duration := time.Since(start)
+	etcdv3Duration.With(prometheus.Labels{"type": "get"}).Add(duration.Seconds()*1000)
 	if err != nil {
+		etcdv3Count.With(prometheus.Labels{"type": "get","status": "error"}).Inc()
 		return nil, fromEtcV3Error(err)
 	}
 	if len(resp.Kvs) == 0 {
+		etcdv3Count.With(prometheus.Labels{"type": "get","status": "notfound"}).Inc()
 		return nil, ErrKeyNotFound
 	}
+	etcdv3Count.With(prometheus.Labels{"type": "get","status": "ok"}).Inc()
 	kv := resp.Kvs[0]
 	return &KVPair{Key: string(kv.Key), Value: kv.Value, LastIndex: uint64(kv.ModRevision)}, nil
 }
 
 func (s *etcdV3Store) List(pctx context.Context, directory string) ([]*KVPair, error) {
 	ctx, cancel := context.WithTimeout(pctx, s.requestTimeout)
+	start := time.Now()
 	resp, err := s.c.Get(ctx, directory, etcdclientv3.WithPrefix())
 	cancel()
+	duration := time.Since(start)
+	etcdv3Duration.With(prometheus.Labels{"type": "list"}).Add(duration.Seconds()*1000)
 	if err != nil {
+		etcdv3Count.With(prometheus.Labels{"type": "list","status": "error"}).Inc()
 		return nil, fromEtcV3Error(err)
 	}
+	etcdv3Count.With(prometheus.Labels{"type": "list","status": "ok"}).Inc()
 	kvPairs := make([]*KVPair, len(resp.Kvs))
 	for i, kv := range resp.Kvs {
 		kvPairs[i] = &KVPair{Key: string(kv.Key), Value: kv.Value, LastIndex: uint64(kv.ModRevision)}
@@ -105,25 +126,42 @@ func (s *etcdV3Store) AtomicPut(pctx context.Context, key string, value []byte, 
 		// key doens't exists
 		cmp = etcdclientv3.Compare(etcdclientv3.CreateRevision(key), "=", 0)
 	}
+	etcdv3Count.With(prometheus.Labels{"type": "puttx","status": "compare"}).Inc()
 	ctx, cancel := context.WithTimeout(pctx, s.requestTimeout)
+	start := time.Now()
 	txn := s.c.Txn(ctx).If(cmp)
+	etcdv3Count.With(prometheus.Labels{"type": "puttx","status": "btx"}).Inc()
 	txn = txn.Then(etcdclientv3.OpPut(key, string(value), etcdv3Options...))
 	tresp, err := txn.Commit()
+	duration := time.Since(start)
+	etcdv3Duration.With(prometheus.Labels{"type": "puttx"}).Add(duration.Seconds()*1000)
+	etcdv3Count.With(prometheus.Labels{"type": "puttx","status": "etx"}).Inc()
 	cancel()
 	if err != nil {
+		etcdv3Count.With(prometheus.Labels{"type": "puttx","status": "error"}).Inc()
 		return nil, fromEtcV3Error(err)
 	}
 	if !tresp.Succeeded {
+		etcdv3Count.With(prometheus.Labels{"type": "puttx","status": "errtx"}).Inc()
 		return nil, ErrKeyModified
 	}
+	etcdv3Count.With(prometheus.Labels{"type": "puttx","status": "ok"}).Inc()
 	revision := tresp.Responses[0].GetResponsePut().Header.Revision
 	return &KVPair{Key: key, Value: value, LastIndex: uint64(revision)}, nil
 }
 
 func (s *etcdV3Store) Delete(pctx context.Context, key string) error {
 	ctx, cancel := context.WithTimeout(pctx, s.requestTimeout)
+	start := time.Now()
 	_, err := s.c.Delete(ctx, key)
 	cancel()
+	duration := time.Since(start)
+	etcdv3Duration.With(prometheus.Labels{"type": "delete"}).Add(duration.Seconds()*1000)
+	if err != nil {
+		etcdv3Count.With(prometheus.Labels{"type": "delete","status": "error"}).Inc()
+	} else {
+		etcdv3Count.With(prometheus.Labels{"type": "delete","status": "ok"}).Inc()
+	}
 	return fromEtcV3Error(err)
 }
 
