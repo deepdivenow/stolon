@@ -30,6 +30,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -771,7 +772,6 @@ func (p *PostgresKeeper) getLastPGState() *cluster.PostgresState {
 func (p *PostgresKeeper) Start(ctx context.Context) {
 	endSMCh := make(chan struct{})
 	endPgStatecheckerCh := make(chan struct{})
-	endUpdateKeeperInfo := make(chan struct{})
 
 	var err error
 	var cd *cluster.ClusterData
@@ -796,9 +796,12 @@ func (p *PostgresKeeper) Start(ctx context.Context) {
 
 	_ = p.pgm.StopIfStarted(true)
 
-	smTimerCh := time.NewTimer(0).C
-	updatePGStateTimerCh := time.NewTimer(0).C
-	updateKeeperInfoTimerCh := time.NewTimer(0).C
+	smTimer := time.NewTimer(0)
+	updatePGStateTimer := time.NewTimer(0)
+	updateKeeperInfoTimer := time.NewTimer(0)
+	var keeperInfoWorkersCount int32 = 0
+	keeperInfoWorkersMutex := sync.Mutex{}
+	timeBetweenKeeperInfo := time.Now()
 	for {
 		// The sleepInterval can be updated during normal execution. Ensure we regularly
 		// refresh the metric to account for those changes.
@@ -813,16 +816,16 @@ func (p *PostgresKeeper) Start(ctx context.Context) {
 			p.end <- nil
 			return
 
-		case <-smTimerCh:
+		case <-smTimer.C:
 			go func() {
 				p.postgresKeeperSM(ctx)
 				endSMCh <- struct{}{}
 			}()
 
 		case <-endSMCh:
-			smTimerCh = time.NewTimer(p.sleepInterval).C
+			smTimer.Reset(p.sleepInterval)
 
-		case <-updatePGStateTimerCh:
+		case <-updatePGStateTimer.C:
 			// updateKeeperInfo two times faster than the sleep interval
 			go func() {
 				p.updatePGState(ctx)
@@ -830,19 +833,37 @@ func (p *PostgresKeeper) Start(ctx context.Context) {
 			}()
 
 		case <-endPgStatecheckerCh:
-			// updateKeeperInfo two times faster than the sleep interval
-			updatePGStateTimerCh = time.NewTimer(p.sleepInterval / 2).C
+			updatePGStateTimer.Reset(p.sleepInterval)
 
-		case <-updateKeeperInfoTimerCh:
+		case <-updateKeeperInfoTimer.C:
+			// updateKeeperInfo two times faster than the sleep interval
+			updateKeeperInfoTimer.Reset(p.sleepInterval / 2)
+
 			go func() {
-				if err := p.updateKeeperInfo(); err != nil {
-					log.Errorw("failed to update keeper info", zap.Error(err))
+				atomic.AddInt32(&keeperInfoWorkersCount, 1)
+				defer atomic.AddInt32(&keeperInfoWorkersCount, -1)
+				kiwNow := atomic.LoadInt32(&keeperInfoWorkersCount)
+				if kiwNow > 1 {
+					log.Errorw("Keeper Info Processes ", zap.Int32("count", keeperInfoWorkersCount))
 				}
-				endUpdateKeeperInfo <- struct{}{}
+				if kiwNow > 2 {
+					log.Errorw("Failed is more then 2 workers in update keeper info loop, exit")
+					return
+				}
+				// In this section only 2 threads will be running
+				keeperInfoWorkersMutex.Lock()
+				defer keeperInfoWorkersMutex.Unlock()
+				if err := p.updateKeeperInfo(); err != nil {
+					log.Errorw("Update Keeper Info failed etcd", zap.Error(err))
+				}
+				interval := time.Since(timeBetweenKeeperInfo)
+				log.Infow("Update Keeper Info time ", zap.Duration("interval", interval))
+				if interval > p.sleepInterval+100*time.Millisecond {
+					log.Errorw("Update Keeper Info failed time ", zap.Duration("interval", interval))
+				}
+				timeBetweenKeeperInfo = time.Now()
 			}()
 
-		case <-endUpdateKeeperInfo:
-			updateKeeperInfoTimerCh = time.NewTimer(p.sleepInterval).C
 		}
 	}
 }
