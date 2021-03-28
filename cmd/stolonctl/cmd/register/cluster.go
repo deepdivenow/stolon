@@ -18,8 +18,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/store"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/store"
 )
 
 // Cluster type exposes necessary methods to find master and slave

@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sorintlab/stolon/internal/common"
+	"github.com/deepdivenow/stolon/internal/common"
 
 	"os"
 

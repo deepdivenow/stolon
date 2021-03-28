@@ -28,8 +28,8 @@ import (
 	"github.com/docker/leadership"
 	"github.com/docker/libkv"
 	libkvstore "github.com/docker/libkv/store"
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/common"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/common"
 	etcdclientv3 "go.etcd.io/etcd/clientv3"
 )
 

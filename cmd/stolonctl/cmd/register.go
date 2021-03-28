@@ -21,10 +21,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sorintlab/stolon/cmd"
-	"github.com/sorintlab/stolon/cmd/stolonctl/cmd/register"
-	slog "github.com/sorintlab/stolon/internal/log"
-	"github.com/sorintlab/stolon/internal/store"
+	"github.com/deepdivenow/stolon/cmd"
+	"github.com/deepdivenow/stolon/cmd/stolonctl/cmd/register"
+	slog "github.com/deepdivenow/stolon/internal/log"
+	"github.com/deepdivenow/stolon/internal/store"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )

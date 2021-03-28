@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/consul/api"
-	"github.com/sorintlab/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/cluster"
 )
 
 // HealthCheck holds necessary information for performing

@@ -21,10 +21,10 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/common"
-	"github.com/sorintlab/stolon/internal/store"
-	"github.com/sorintlab/stolon/internal/util"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/common"
+	"github.com/deepdivenow/stolon/internal/store"
+	"github.com/deepdivenow/stolon/internal/util"
 
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"

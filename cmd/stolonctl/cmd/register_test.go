@@ -15,14 +15,14 @@ package cmd
 
 import (
 	"github.com/golang/mock/gomock"
-	"github.com/sorintlab/stolon/cmd/stolonctl/cmd/internal/mock/register"
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/mock/store"
-	"github.com/sorintlab/stolon/internal/store"
+	"github.com/deepdivenow/stolon/cmd/stolonctl/cmd/internal/mock/register"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/mock/store"
+	"github.com/deepdivenow/stolon/internal/store"
 	"testing"
 
-	"github.com/sorintlab/stolon/cmd"
-	"github.com/sorintlab/stolon/cmd/stolonctl/cmd/register"
+	"github.com/deepdivenow/stolon/cmd"
+	"github.com/deepdivenow/stolon/cmd/stolonctl/cmd/register"
 )
 
 func TestCheckConfig(t *testing.T) {

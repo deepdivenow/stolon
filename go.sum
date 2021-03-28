@@ -73,6 +73,8 @@ github.com/deepdivenow/pollon v0.0.0-20210326160014-60c17b96b186 h1:r7S8t92Nl1ju
 github.com/deepdivenow/pollon v0.0.0-20210326160014-60c17b96b186/go.mod h1:9jYWRkNnfbm/siDuejhL7pf/cA4YNvtwMrzlaapjwHo=
 github.com/deepdivenow/pollon v0.0.0-20210326204219-95c27a12752f h1:2spVn6SVtpZZIKt/ljWUna/lq7WZ+uuVQBSMLcOmjNk=
 github.com/deepdivenow/pollon v0.0.0-20210326204219-95c27a12752f/go.mod h1:9jYWRkNnfbm/siDuejhL7pf/cA4YNvtwMrzlaapjwHo=
+github.com/deepdivenow/tcpkeepalive v0.2.1-0.20210328115537-b832be43c038 h1:ClMVPiUaJWu2QE40orPQtEZSg0CDW4lEevZAT8qI4uk=
+github.com/deepdivenow/tcpkeepalive v0.2.1-0.20210328115537-b832be43c038/go.mod h1:Rjf5zWbCl78jwcwmyG2BeGUDVILsgvnmK6n7jVgfNKc=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=

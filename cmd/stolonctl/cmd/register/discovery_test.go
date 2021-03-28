@@ -20,8 +20,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/consul/api"
-	"github.com/sorintlab/stolon/cmd/stolonctl/cmd/internal/mock/register"
-	"github.com/sorintlab/stolon/cmd/stolonctl/cmd/register"
+	"github.com/deepdivenow/stolon/cmd/stolonctl/cmd/internal/mock/register"
+	"github.com/deepdivenow/stolon/cmd/stolonctl/cmd/register"
 )
 
 func TestNewServiceDiscovery(t *testing.T) {

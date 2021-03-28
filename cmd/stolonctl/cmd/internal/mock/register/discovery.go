@@ -7,7 +7,7 @@ package mock_register
 import (
 	gomock "github.com/golang/mock/gomock"
 	api "github.com/hashicorp/consul/api"
-	register "github.com/sorintlab/stolon/cmd/stolonctl/cmd/register"
+	register "github.com/deepdivenow/stolon/cmd/stolonctl/cmd/register"
 	reflect "reflect"
 )
 

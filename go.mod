@@ -1,10 +1,11 @@
-module github.com/sorintlab/stolon
+module github.com/deepdivenow/stolon
 
 require (
 	// force github.com/coreos/etcd to v3.3.18 that doesn't use github.com/ugorji/go
 	github.com/coreos/etcd v3.3.18+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepdivenow/pollon v0.0.0-20210326204219-95c27a12752f
+	github.com/deepdivenow/tcpkeepalive v0.2.1-0.20210328115537-b832be43c038 // indirect
 	github.com/docker/leadership v0.1.0
 	github.com/docker/libkv v0.2.1
 	github.com/evanphx/json-patch v4.5.0+incompatible
@@ -18,7 +19,6 @@ require (
 	github.com/prometheus/client_golang v1.4.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sgotti/gexpect v0.0.0-20161123102107-0afc6c19f50a
-	github.com/sorintlab/tcpkeepalive v0.2.0 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20201125193152-8a03d2e9614b

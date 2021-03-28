@@ -17,8 +17,8 @@ package cmd
 import (
 	"encoding/json"
 
-	cmdcommon "github.com/sorintlab/stolon/cmd"
-	"github.com/sorintlab/stolon/internal/cluster"
+	cmdcommon "github.com/deepdivenow/stolon/cmd"
+	"github.com/deepdivenow/stolon/internal/cluster"
 
 	"github.com/spf13/cobra"
 )

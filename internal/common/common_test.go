@@ -17,8 +17,8 @@ package common_test
 import (
 	"testing"
 
-	"github.com/sorintlab/stolon/internal/common"
-	"github.com/sorintlab/stolon/internal/util"
+	"github.com/deepdivenow/stolon/internal/common"
+	"github.com/deepdivenow/stolon/internal/util"
 )
 
 func TestDiffReturnsChangedParams(t *testing.T) {

@@ -19,10 +19,10 @@ import (
 	"log"
 	"os"
 
-	keepercmd "github.com/sorintlab/stolon/cmd/keeper/cmd"
-	proxycmd "github.com/sorintlab/stolon/cmd/proxy/cmd"
-	sentinelcmd "github.com/sorintlab/stolon/cmd/sentinel/cmd"
-	stolonctlcmd "github.com/sorintlab/stolon/cmd/stolonctl/cmd"
+	keepercmd "github.com/deepdivenow/stolon/cmd/keeper/cmd"
+	proxycmd "github.com/deepdivenow/stolon/cmd/proxy/cmd"
+	sentinelcmd "github.com/deepdivenow/stolon/cmd/sentinel/cmd"
+	stolonctlcmd "github.com/deepdivenow/stolon/cmd/stolonctl/cmd"
 
 	"github.com/spf13/cobra/doc"
 )

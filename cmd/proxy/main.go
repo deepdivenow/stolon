@@ -15,7 +15,7 @@
 package main
 
 import (
-	"github.com/sorintlab/stolon/cmd/proxy/cmd"
+	"github.com/deepdivenow/stolon/cmd/proxy/cmd"
 )
 
 func main() {

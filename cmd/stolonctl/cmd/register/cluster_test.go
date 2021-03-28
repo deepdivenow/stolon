@@ -19,8 +19,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/mock/store"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/mock/store"
 )
 
 func TestNewCluster(t *testing.T) {

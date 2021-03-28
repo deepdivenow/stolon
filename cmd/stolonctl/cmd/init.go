@@ -20,9 +20,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	cmdcommon "github.com/sorintlab/stolon/cmd"
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/common"
+	cmdcommon "github.com/deepdivenow/stolon/cmd"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/common"
 	"github.com/spf13/cobra"
 )
 

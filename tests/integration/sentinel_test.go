@@ -26,9 +26,9 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
-	"github.com/sorintlab/stolon/internal/cluster"
-	"github.com/sorintlab/stolon/internal/common"
-	"github.com/sorintlab/stolon/internal/store"
+	"github.com/deepdivenow/stolon/internal/cluster"
+	"github.com/deepdivenow/stolon/internal/common"
+	"github.com/deepdivenow/stolon/internal/store"
 )
 
 func TestSentinelEnabledProxies(t *testing.T) {

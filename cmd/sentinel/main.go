@@ -15,7 +15,7 @@
 package main
 
 import (
-	"github.com/sorintlab/stolon/cmd/sentinel/cmd"
+	"github.com/deepdivenow/stolon/cmd/sentinel/cmd"
 )
 
 func main() {
