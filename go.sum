@@ -67,6 +67,12 @@ github.com/davecgh/go-spew v0.0.0-20151105211317-5215b55f46b2/go.mod h1:J7Y8YcW2
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/deepdivenow/pollon v0.0.0-20210326154101-0ea7e85f0572 h1:4gaI7ya3jog0i5J2eOIcASbi/CsDnsOFEgR9OmqmuK0=
+github.com/deepdivenow/pollon v0.0.0-20210326154101-0ea7e85f0572/go.mod h1:9jYWRkNnfbm/siDuejhL7pf/cA4YNvtwMrzlaapjwHo=
+github.com/deepdivenow/pollon v0.0.0-20210326160014-60c17b96b186 h1:r7S8t92Nl1jum/8AZNSEb382NXv6MLOo9RPCP7sgbfY=
+github.com/deepdivenow/pollon v0.0.0-20210326160014-60c17b96b186/go.mod h1:9jYWRkNnfbm/siDuejhL7pf/cA4YNvtwMrzlaapjwHo=
+github.com/deepdivenow/pollon v0.0.0-20210326204219-95c27a12752f h1:2spVn6SVtpZZIKt/ljWUna/lq7WZ+uuVQBSMLcOmjNk=
+github.com/deepdivenow/pollon v0.0.0-20210326204219-95c27a12752f/go.mod h1:9jYWRkNnfbm/siDuejhL7pf/cA4YNvtwMrzlaapjwHo=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
@@ -327,8 +333,6 @@ github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d/go.mod h1
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/soheilhy/cmux v0.1.4 h1:0HKaf1o97UwFjHH9o5XsHUOF+tqmdA7KEzXLpiyaw0E=
 github.com/soheilhy/cmux v0.1.4/go.mod h1:IM3LyeVVIOuxMH7sFAkER9+bJ4dT7Ms6E4xg4kGIyLM=
-github.com/sorintlab/pollon v0.0.0-20181009091703-248c68238c16 h1:qOg8jM4RzD8CysFs4El1l7hwtl4bLApqbhh7EoIxLns=
-github.com/sorintlab/pollon v0.0.0-20181009091703-248c68238c16/go.mod h1:5vFcIguA+p40loRzZZejq5PdOVLz86bwSgeN8kRffIE=
 github.com/sorintlab/tcpkeepalive v0.2.0 h1:qHYOzlXMtGIhIUIaDFS1KdygDPSnJZWE6kxI9/abvG4=
 github.com/sorintlab/tcpkeepalive v0.2.0/go.mod h1:99dB6dRb+0HML/17LgJalvzJ5FsAfC5ryQX2x2x8yw8=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=

@@ -32,7 +32,7 @@ import (
 	"github.com/sorintlab/stolon/internal/util"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/sorintlab/pollon"
+	"github.com/deepdivenow/pollon"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -253,7 +253,9 @@ func (c *ClusterChecker) Check() error {
 		}
 		return nil
 	}
-
+	//for _,db := range cd.DBs{
+	//	db.Status.ListenAddress
+	//}
 	db, ok := cd.DBs[proxy.Spec.MasterDBUID]
 	if !ok {
 		log.Infow("no db object available, closing connections to master", "db", proxy.Spec.MasterDBUID)
@@ -298,12 +300,11 @@ func (c *ClusterChecker) Check() error {
 	// sentinel has read our proxyinfo and knows we are alive
 	if util.StringInSlice(proxy.Spec.EnabledProxies, c.uid) {
 		log.Infow("proxying to master address", "address", addr)
-		c.sendPollonConfData(pollon.ConfData{DestAddr: addr})
+		c.sendPollonConfData(pollon.ConfData{DestAddr: []*net.TCPAddr{addr}})
 	} else {
 		log.Infow("not proxying to master address since we aren't in the enabled proxies list", "address", addr)
 		c.sendPollonConfData(pollon.ConfData{DestAddr: nil})
 	}
-
 	return nil
 }
 
