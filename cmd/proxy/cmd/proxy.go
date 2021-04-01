@@ -22,7 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/deepdivenow/stolon/cmd"
 	"github.com/deepdivenow/stolon/internal/cluster"
 	"github.com/deepdivenow/stolon/internal/common"
@@ -30,6 +29,7 @@ import (
 	slog "github.com/deepdivenow/stolon/internal/log"
 	"github.com/deepdivenow/stolon/internal/store"
 	"github.com/deepdivenow/stolon/internal/util"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/deepdivenow/pollon"
@@ -48,10 +48,12 @@ var CmdProxy = &cobra.Command{
 type config struct {
 	cmd.CommonConfig
 
-	listenAddress string
-	port          string
-	stopListening bool
-	debug         bool
+	listenAddress       string
+	port                string
+	stopListening       bool
+	replicaMode         bool
+	replicaModeFallBack bool
+	debug               bool
 
 	keepAliveIdle     int
 	keepAliveCount    int
@@ -66,6 +68,8 @@ func init() {
 	CmdProxy.PersistentFlags().StringVar(&cfg.listenAddress, "listen-address", "127.0.0.1", "proxy listening address")
 	CmdProxy.PersistentFlags().StringVar(&cfg.port, "port", "5432", "proxy listening port")
 	CmdProxy.PersistentFlags().BoolVar(&cfg.stopListening, "stop-listening", true, "stop listening on store error")
+	CmdProxy.PersistentFlags().BoolVar(&cfg.replicaMode, "replica-mode", false, "proxy to replicas")
+	CmdProxy.PersistentFlags().BoolVar(&cfg.replicaModeFallBack, "replica-mode-fallback", false, "Fallback to master when no lives replicas")
 	CmdProxy.PersistentFlags().BoolVar(&cfg.debug, "debug", false, "enable debug logging")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveIdle, "tcp-keepalive-idle", 0, "set tcp keepalive idle (seconds)")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveCount, "tcp-keepalive-count", 0, "set tcp keepalive probe count number")
@@ -189,6 +193,63 @@ func (c *ClusterChecker) SetProxyInfo(e store.Store, generation int64, proxyTime
 	return nil
 }
 
+func tcpAddrToStr(addr []*net.TCPAddr) string{
+	var result string
+	for i,a := range addr{
+		if i>0{
+			result+=" "
+		}
+		result+=a.String()
+	}
+	return result
+}
+func GetProxyDBs(cd *cluster.ClusterData) ([]*net.TCPAddr){
+	var result []*net.TCPAddr
+	//Proxy to master
+	if !cfg.replicaMode {
+		proxy := cd.Proxy
+		db, ok := cd.DBs[proxy.Spec.MasterDBUID]
+		if !ok {
+			return nil
+		}
+		addr,err:=net.ResolveTCPAddr("tcp", net.JoinHostPort(db.Status.ListenAddress, db.Status.Port))
+		if err!=nil{
+			return nil
+		}
+		result=append(result,addr)
+		return result
+	}
+	//Proxy to replicas
+	var master,replicas []*net.TCPAddr
+	for _,db := range cd.DBs{
+		if !db.Status.Healthy{
+			continue
+		}
+		if len(db.Status.ListenAddress) < 1 || len(db.Status.ListenAddress) < 1 {
+			continue
+		}
+		if db.Spec.Role == common.RoleStandby {
+			addr,err:=net.ResolveTCPAddr("tcp", net.JoinHostPort(db.Status.ListenAddress, db.Status.Port))
+			if err!=nil{
+				continue
+			}
+			replicas=append(replicas,addr)
+		}
+		if db.Spec.Role == common.RoleMaster {
+			addr,err:=net.ResolveTCPAddr("tcp", net.JoinHostPort(db.Status.ListenAddress, db.Status.Port))
+			if err!=nil{
+				continue
+			}
+			master=append(master,addr)
+		}
+	}
+	if len(replicas) < 1 && cfg.replicaModeFallBack {
+		log.Errorw("No alive replicas FallBack to master")
+		return master
+	}
+	return replicas
+}
+
 // Check reads the cluster data and applies the right pollon configuration.
 func (c *ClusterChecker) Check() error {
 	cd, _, err := c.e.GetClusterData(context.TODO())
@@ -253,12 +314,10 @@ func (c *ClusterChecker) Check() error {
 		}
 		return nil
 	}
-	//for _,db := range cd.DBs{
-	//	db.Status.ListenAddress
-	//}
-	db, ok := cd.DBs[proxy.Spec.MasterDBUID]
-	if !ok {
-		log.Infow("no db object available, closing connections to master", "db", proxy.Spec.MasterDBUID)
+
+	addr := GetProxyDBs(cd)
+	if len(addr) < 1 {
+		log.Infow("no db object available, closing connections")
 		c.sendPollonConfData(pollon.ConfData{DestAddr: nil})
 		// ignore errors on setting proxy info
 		if err = c.SetProxyInfo(c.e, proxy.Generation, proxyTimeout); err != nil {
@@ -274,13 +333,7 @@ func (c *ClusterChecker) Check() error {
 		return nil
 	}
 
-	addr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(db.Status.ListenAddress, db.Status.Port))
-	if err != nil {
-		log.Errorw("cannot resolve db address", zap.Error(err))
-		c.sendPollonConfData(pollon.ConfData{DestAddr: nil})
-		return nil
-	}
-	log.Infow("master address", "address", addr)
+	log.Infow("Proxy address", "address", tcpAddrToStr(addr))
 	if err = c.SetProxyInfo(c.e, proxy.Generation, proxyTimeout); err != nil {
 		// if we failed to update our proxy info when a master is defined we
 		// cannot ignore this error since the sentinel won't know that we exist
@@ -299,10 +352,10 @@ func (c *ClusterChecker) Check() error {
 	// start proxing only if we are inside enabledProxies, this ensures that the
 	// sentinel has read our proxyinfo and knows we are alive
 	if util.StringInSlice(proxy.Spec.EnabledProxies, c.uid) {
-		log.Infow("proxying to master address", "address", addr)
-		c.sendPollonConfData(pollon.ConfData{DestAddr: []*net.TCPAddr{addr}})
+		log.Infow("proxying to address", "address", tcpAddrToStr(addr))
+		c.sendPollonConfData(pollon.ConfData{DestAddr: addr})
 	} else {
-		log.Infow("not proxying to master address since we aren't in the enabled proxies list", "address", addr)
+		log.Infow("not proxying to address since we aren't in the enabled proxies list", "address", addr)
 		c.sendPollonConfData(pollon.ConfData{DestAddr: nil})
 	}
 	return nil
