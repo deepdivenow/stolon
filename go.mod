@@ -3,9 +3,9 @@ module github.com/deepdivenow/stolon
 require (
 	github.com/coreos/bbolt v1.3.5 // indirect
 	// force github.com/coreos/etcd to v3.3.18 that doesn't use github.com/ugorji/go
-	// github.com/coreos/etcd v3.3.18+incompatible // indirect
+	github.com/coreos/etcd v3.3.25+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deepdivenow/pollon v0.0.0-20210401131120-252176808a2d
+	github.com/deepdivenow/pollon v0.0.0-20210408170117-06405e5b61ab
 	github.com/docker/leadership v0.1.0
 	github.com/docker/libkv v0.2.1
 	github.com/evanphx/json-patch v4.5.0+incompatible

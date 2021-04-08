@@ -53,6 +53,7 @@ type config struct {
 	stopListening       bool
 	replicaMode         bool
 	replicaModeFallBack bool
+	loadBalancingType   string
 	debug               bool
 
 	keepAliveIdle     int
@@ -74,6 +75,7 @@ func init() {
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveIdle, "tcp-keepalive-idle", 0, "set tcp keepalive idle (seconds)")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveCount, "tcp-keepalive-count", 0, "set tcp keepalive probe count number")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveInterval, "tcp-keepalive-interval", 0, "set tcp keepalive interval (seconds)")
+	CmdProxy.PersistentFlags().StringVar(&cfg.loadBalancingType, "load-balancing-type", "random", "proxy to replicas LB Type")
 
 	if err := CmdProxy.PersistentFlags().MarkDeprecated("debug", "use --log-level=debug instead"); err != nil {
 		log.Fatal(err)
@@ -144,6 +146,9 @@ func (c *ClusterChecker) startPollonProxy() error {
 	pp.SetKeepAliveIdle(time.Duration(cfg.keepAliveIdle) * time.Second)
 	pp.SetKeepAliveCount(cfg.keepAliveCount)
 	pp.SetKeepAliveInterval(time.Duration(cfg.keepAliveInterval) * time.Second)
+	if cfg.loadBalancingType == "leastqueue" {
+		pp.SetLBType(pollon.LeastQueue)
+	}
 
 	c.pp = pp
 	c.listener = listener
