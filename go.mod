@@ -5,7 +5,7 @@ require (
 	// force github.com/coreos/etcd to v3.3.18 that doesn't use github.com/ugorji/go
 	github.com/coreos/etcd v3.3.25+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deepdivenow/pollon v0.0.0-20210408170117-06405e5b61ab
+	github.com/deepdivenow/pollon v0.0.0-20210512103601-1e207c005cfd
 	github.com/docker/leadership v0.1.0
 	github.com/docker/libkv v0.2.1
 	github.com/evanphx/json-patch v4.5.0+incompatible
@@ -32,3 +32,5 @@ require (
 go 1.15
 
 replace github.com/coreos/bbolt v1.3.5 => go.etcd.io/bbolt v1.3.5
+
+//replace github.com/deepdivenow/pollon => /home/dro/go-1.15/src/github.com/deepdivenow/pollon

@@ -55,6 +55,7 @@ type config struct {
 	replicaModeFallBack bool
 	loadBalancingType   string
 	debug               bool
+	logPollon			bool
 
 	keepAliveIdle     int
 	keepAliveCount    int
@@ -72,6 +73,7 @@ func init() {
 	CmdProxy.PersistentFlags().BoolVar(&cfg.replicaMode, "replica-mode", false, "proxy to replicas")
 	CmdProxy.PersistentFlags().BoolVar(&cfg.replicaModeFallBack, "replica-mode-fallback", false, "Fallback to master when no lives replicas")
 	CmdProxy.PersistentFlags().BoolVar(&cfg.debug, "debug", false, "enable debug logging")
+	CmdProxy.PersistentFlags().BoolVar(&cfg.logPollon, "log-pollon", false, "enable pollon logging")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveIdle, "tcp-keepalive-idle", 0, "set tcp keepalive idle (seconds)")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveCount, "tcp-keepalive-count", 0, "set tcp keepalive probe count number")
 	CmdProxy.PersistentFlags().IntVar(&cfg.keepAliveInterval, "tcp-keepalive-interval", 0, "set tcp keepalive interval (seconds)")
@@ -462,7 +464,7 @@ func proxy(c *cobra.Command, args []string) {
 	if cmd.IsColorLoggerEnable(c, &cfg.CommonConfig) {
 		log = slog.SColor()
 	}
-	if slog.IsDebug() {
+	if slog.IsDebug() || cfg.logPollon {
 		if cmd.IsColorLoggerEnable(c, &cfg.CommonConfig) {
 			stdlog := slog.StdLogColor()
 			pollon.SetLogger(stdlog)
